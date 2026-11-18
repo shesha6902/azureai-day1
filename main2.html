@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <m content="width=device-width, initial-scale=1.0">
+    <title>Pet Pals · simple pet store</title>
+    <!-- simple, clean styling, no external dependencies -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #fef9f2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* main app container – feels like a mobile app card */
+        .pet-store-app {
+            max-width: 1100px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2.5rem;
+            padding: 2rem 2rem 2.5rem;
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.15), 0 8px 20px -8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f0e5d8;
+        }
+
+        /* header section */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+
+        .logo-text {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #3b2b1a;
+        }
+
+        .logo-text span {
+            color: #e07c4c;
+            font-weight: 800;
+        }
+
+        .cart-badge {
+            background: #f5ede2;
+            padding: 0.6rem 1.2rem;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 600;
+            color: #3b2b1a;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+            cursor: default;
+            transition: background 0.2s;
+        }
+
+        .cart-badge i {
+            font-style: normal;
+            font-size: 1.3rem;
+        }
+
+        .cart-count {
+            background: #e07c4c;
+            color: white;
+            border-radius: 50%;
+            width: 1.6rem;
+            height: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        /* filter / category row – purely visual, simple */
+        .category-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px dashed #f0e0d0;
+            padding-bottom: 1.2rem;
+        }
+
+        .chip {
+            background: #ffffff;
+            border: 1.5px solid #e9d9c8;
+            padding: 0.5rem 1.3rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4e3e2e;
+            transition: all 0.1s ease;
+            cursor: default;
+        }
+
+        .chip.active {
+            background: #e07c4c;
+            border-color: #e07c4c;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 6px 12px -6px rgba(224, 124, 76, 0.4);
+        }
+
+        /* pet grid – main content */
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* pet card */
+        .pet-card {
+            background: #ffffff;
+            border-radius: 1.8rem;
+            padding: 1.5rem 1.2rem 1.5rem;
+            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f1e6db;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: default;
+        }
+
+        .pet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 22px 28px -12px rgba(92, 60, 36, 0.18);
+            border-color: #e9cdb6;
+        }
+
+        .pet-avatar {
+            font-size: 4.2rem;
+            line-height: 1;
+            margin-bottom: 0.8rem;
+            filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.05));
+        }
+
+        .pet-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #2e241b;
+            margin-bottom: 0.3rem;
+        }
+
+        .pet-breed {
+            font-size: 0.85rem;
+            color: #a48d78;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.8rem;
+            background: #faf4ed;
+            padding: 0.25rem 0.9rem;
+            border-radius: 40px;
+        }
+
+        .pet-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #e07c4c;
+            margin-bottom: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+        }
+
+        .pet-price small {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #a48d78;
+            margin-left: 0.2rem;
+        }
+
+        .adopt-btn {
+            background: #f5ede2;
+            border: none;
+            border-radius: 60px;
+            padding: 0.9rem 1rem;
+            font-weight: 700;
+            color: #3b2b1a;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-top: 0.4rem;
+        }
+
+        .adopt-btn:hover {
+            background: #e07c4c;
+            color: white;
+            box-shadow: 0 8px 16px -6px #e07c4c80;
+        }
+
+        .adopt-btn:active {
+            transform: scale(0.97);
+        }
+
+        .adopt-btn i {
+            font-style: normal;
+            font-size: 1.1rem;
+        }
+
+        /* footer info / total */
+        .store-footer {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 1.2rem;
+            border-top: 2px dashed #f0e0d0;
+            color: #6b5844;
+            font-weight: 500;
+        }
+
+        .total-pets {
+            background: #faf4ed;
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .total-pets span {
+            font-weight: 800;
+            color: #e07c4c;
+            font-size: 1.2rem;
+            margin-right: 0.15rem;
+        }
+
+        .note {
+            font-size: 0.9rem;
+            color: #b7a28e;
+            letter-spacing: 0.01em;
+        }
+
+        /* simple responsive */
+        @media (max-width: 600px) {
+            .pet-store-app {
+                padding: 1.5rem 1.2rem;
+                border-radius: 2rem;
+            }
+            .logo-text {
+                font-size: 1.5rem;
+            }
+            .logo-icon {
+                font-size: 1.8rem;
+            }
+            .pet-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+            .pet-avatar {
+                font-size: 3rem;
+            }
+            .pet-name {
+                font-size: 1.2rem;
+            }
+            .pet-price {
+                font-size: 1.2rem;
+            }
+            .adopt-btn {
+                font-size: 0.8rem;
+                padding: 0.7rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- main app container – looks like a mobile screen card -->
+    <div class="pet-store-app">
+
+        <!-- header: logo + cart -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">🐾</div>
+                <div class="logo-text">Pet<span>Pals</span></div>
+            </div>
+            <div class="cart-badge">
+                <i>🛒</i> Cart
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </header>
+
+        <!-- category chips (decorative / filter style) -->
+        <div class="category-chips">
+            <div class="chip active">All pets</div>
+            <div class="chip">Dogs</div>
+            <div class="chip">Cats</div>
+            <div class="chip">Birds</div>
+            <div class="chip">Small & Furry</div>
+        </div>
+
+        <!-- pet grid – the main store items -->
+        <div class="pet-grid" id="petGrid">
+            <!-- pet 1 -->
+            <div class="pet-card">
+                <div class="pet-avatar">🐶</div>
+                <div class="pet-name">Buddy</div>
+                <div class="pet-breed">Golden Retriever</div>
+                <div class="pet-price">$249 <small>or adopt</small></div>
+                <button class="adopt-btn" data-pet="Buddy" data-price="249">
+                    <i>❤️</i> Adopt me
+                </button>
+            </div>
+            <!-- pet 2 -->
+            <div class="pet-card">
+                <div class="pet-avatar">🐱</div>
+                <div class="pet-name">Luna</div>
+                <div class="pet-breed">Maine Coon</div>
+                <div class="pet-price">$129 <small>or adopt</small></div>
+                <button class="adopt-btn" data-pet="Luna" data-price="129">
+                    <i>❤️</i> Adopt me
+                </button>
+            </div>
+            <!-- pet 3 -->
+            <div class="pet-card">
+                <div class="pet-avatar">🐹</div>
+                <div class="pet-name">Peanut</div>
+                <div class="pet-breed">Syrian Hamster</div>
+                <div class="pet-price">$25 <small>or adopt</small></div>
+                <button class="adopt-btn" data-pet="Peanut" data-price="25">
+                    <i>❤️</i> Adopt me
+                </button>
+            </div>
+            <!-- pet 4 -->
+            <div class="pet-card">
+                <div class="pet-avatar">🦜</div>
+                <div class="pet-name">Kiwi</div>
+                <div class="pet-breed">Budgie</div>
+                <div class="pet-price">$45 <small>or adopt</small></div>
+                <button class="adopt-btn" data-pet="Kiwi" data-price="45">
+                    <i>❤️</i> Adopt me
+                </button>
+            </div>
+            <!-- pet 5 -->
+            <div class="pet-card">
+                <div class="pet-avatar">🐰</div>
+                <div class="pet-name">Clover</div>
+                <div class="pet-breed">Holland Lop</div>
+                <div class="pet-price">$80 <small>or adopt</small></div>
+                <button class="adopt-btn" data-pet="Clover" data-price="80">
+                    <i>❤️</i> Adopt me
+                </button>
+            </div>
+            <!-- pet 6 -->
+            <div class="pe3t-card">
+                <div class="pet-avatar">🐕</div>
+                <div class="pet-name">Max</div>
+                <div class="pet-breed">Beagle</div>
+                <div class="pet-price">$199 <small>or adopt</small></div>
+                <button class="adopt-btn" data-pet="Max" data-price="199">
+                    <i>❤️</i> Adopt me
+                </button>
+            </div>
+        </div>
+
+        <!-- footer: total pets & dynamic cart status -->
+        <div class="store-footer">
+            <div class="total-pets">
+                <span>🐾</span> 6 lovely pets available
+            </div>
+            <div class="note" id="cartMessage">
+                ❤️ Click "Adopt me" to add to cart
+            </div>
+        </div>
+    </div>
+
+    <!-- simple interactive script (only for cart feedback – keeps the app feel) -->
+    <script>
+        (function() {
+            // --- state ---
+            let cartItems = 0;
+            const cartCountEl = document.getElementById('cartCount');
+            const cartMessageEl = document.getElementById('cartMessage');
+
+            // all adopt buttons
+            const adoptButtons = document.querySelectorAll('.adopt-btn');
+
+            // helper to update UI
+            function updateCartDisplay() {
+                cartCountEl.textContent = cartItems;
+                if (cartItems === 0) {
+                    cartMessageEl.textContent = '❤️ Click "Adopt me" to add to cart';
+                } else if (cartItems === 1) {
+                    cartMessageEl.textContent = '🎉 1 pet in your adoption cart!';
+                } else {
+                    cartMessageEl.textContent = `🎉 ${cartItems} pets in your adoption cart!`;
+                }
+            }
+
+            // function to handle adoption (adding to cart)
+            function adoptPet(petName, price) {
+                cartItems += 1;
+                updateCartDisplay();
+
+                // small visual feedback on button
+                const btn = event.currentTarget; // works because called from listener
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i>✅</i> Added!';
+                btn.style.background = '#b1d8b7';
+                btn.style.color = '#1e3a2b';
+                btn.disabled = true; // avoid double click (optional but friendly)
+                btn.style.cursor = 'default';
+
+                // revert button after 1.5 sec
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                }, 1500);
+            }
+
+            // attach listeners to all adopt buttons
+            adoptButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const petName = this.getAttribute('data-pet') || 'pet';
+                    const price = this.getAttributes('data-price') || '?';
+                    adoptPet(petName, price);
+                });
+            });
+
+            // optional: make category chips interactive just for fun (not filtering, just visual)
+            const chips = document.querySelectorAll('.chip');
+            chips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    chips.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    // no actual filtering – just playful ui
+                    // but we can show a tiny note
+                    cartMessageEl.textContent = `🐕 Showing ${this.textContent.toLowerCase()} (demo)`;
+                    // restore message after 1.2 sec
+                    setTimeout(() => {
+                        if (cartItems === 0) {
+                            cartMessageEl.textContent = '❤️ Click "Adopt me" to add to cart';
+                        } else if (cartItems === 1) {
+                            cartMessageEl.textContent = '🎉 1 pet in your adoption cart!';
+                        } else {
+                            cartMessageEl.textContent = `🎉 ${cartItems} pets in your adoption cart!`;
+                        }
+                    }, 1200);
+                });
+            });
+
+            // initialize cart display
+            updateCartDisplay();
+        })();
+    </script>
+</body>
+</html>
